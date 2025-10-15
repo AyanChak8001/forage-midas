@@ -1,0 +1,44 @@
+general:
+  kafka-topic: transactions
+
+server:
+  port: 33400
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+
+  kafka:
+    # For normal runs point this to a real broker:
+    bootstrap-servers: localhost:9092
+
+    consumer:
+      group-id: test-consumer
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.jpmc.midascore.*
+      auto-offset-reset: earliest
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    spring:
+      kafka:
+        listener:
+          auto-startup: false
+
+
+# Optional: prevent listeners from starting if no broker available
+# spring.kafka.listener.auto-startup: false
